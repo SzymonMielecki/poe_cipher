@@ -2,20 +2,15 @@ use eframe::egui;
 use poe_cipher::{Cipher, Poe};
 
 fn main() -> Result<(), eframe::Error> {
-    env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
+    env_logger::init();
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([320.0, 240.0]),
         ..Default::default()
     };
     eframe::run_native(
-        "My egui App",
+        "Poe Cipher App by Szymon Mielecki",
         options,
-        Box::new(|cc| {
-            // This gives us image support:
-            egui_extras::install_image_loaders(&cc.egui_ctx);
-
-            Box::<MyApp>::default()
-        }),
+        Box::new(|_| Box::<MyApp>::default()),
     )
 }
 

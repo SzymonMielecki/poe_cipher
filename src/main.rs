@@ -1,5 +1,8 @@
 use eframe::egui;
-use poe_cipher::{Cipher, Poe};
+use poe_cipher::{
+    poe::{Cipher, Poe},
+    switcher::toggle,
+};
 
 fn main() -> Result<(), eframe::Error> {
     env_logger::init();
@@ -30,23 +33,35 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let mut enc = true;
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Poe Cipher App");
-            ui.vertical(|ui| {
-                let name_label = ui.label("Plain Text:");
-                ui.text_edit_multiline(&mut self.plain_text)
-                    .labelled_by(name_label.id);
+            ui.horizontal(|ui| {
+                ui.label("Decrypt");
+                ui.add(toggle(&mut enc));
+                ui.label("Encrypt")
             });
-            if ui.button("Turn Plain Text To Cipher").clicked() {
-                self.cipher_text = Poe::encrypt(&self.plain_text)
-            }
-            ui.vertical(|ui| {
-                let name_label = ui.label("Cipher Text:");
-                ui.text_edit_multiline(&mut self.cipher_text)
-                    .labelled_by(name_label.id);
-            });
-            if ui.button("Turn Cipher Text To Plain").clicked() {
-                self.plain_text = Poe::decrypt(&self.cipher_text)
+            match enc {
+                true => {
+                    ui.vertical(|ui| {
+                        let name_label = ui.label("Plain Text:");
+                        ui.text_edit_multiline(&mut self.plain_text)
+                            .labelled_by(name_label.id);
+                    });
+                    if ui.button("Turn Plain Text To Cipher").clicked() {
+                        self.cipher_text = Poe::encrypt(&self.plain_text)
+                    }
+                }
+                false => {
+                    ui.vertical(|ui| {
+                        let name_label = ui.label("Cipher Text:");
+                        ui.text_edit_multiline(&mut self.cipher_text)
+                            .labelled_by(name_label.id);
+                    });
+                    if ui.button("Turn Cipher Text To Plain").clicked() {
+                        self.plain_text = Poe::decrypt(&self.cipher_text)
+                    }
+                }
             }
         });
     }

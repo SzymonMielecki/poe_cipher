@@ -57,6 +57,9 @@ impl eframe::App for MyApp {
                         Actions::Decrypt => self.output = Poe::decrypt(&self.input),
                     }
                 }
+
+                ui.end_row();
+                ui.end_row();
                 ui.label(&self.output);
             });
         });

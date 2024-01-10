@@ -1,8 +1,5 @@
 use eframe::egui;
-use poe_cipher::{
-    poe::{Cipher, Poe},
-    switcher::toggle,
-};
+use poe_cipher::{Cipher, Poe};
 
 fn main() -> Result<(), eframe::Error> {
     env_logger::init();
@@ -18,51 +15,50 @@ fn main() -> Result<(), eframe::Error> {
 }
 
 struct MyApp {
-    plain_text: String,
-    cipher_text: String,
+    action: Actions,
+    output: String,
+    input: String,
 }
 
 impl Default for MyApp {
     fn default() -> Self {
         Self {
-            cipher_text: ")[:9‡* 96808-76 [5)0?3?,8 *5 )[8)-".into(),
-            plain_text: "".into(),
+            action: Actions::Decrypt,
+            input: ")[:9‡* 96808-76 [5)0?3?,8 *5 )[8)-".into(),
+            output: "".into(),
         }
     }
 }
 
+#[derive(PartialEq)]
+enum Actions {
+    Encrypt,
+    Decrypt,
+}
+
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let mut enc = true;
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Poe Cipher App");
-            ui.horizontal(|ui| {
-                ui.label("Decrypt");
-                ui.add(toggle(&mut enc));
-                ui.label("Encrypt")
+            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                ui.heading("Poe Cipher App");
+                if ui
+                    .selectable_value(&mut self.action, Actions::Decrypt, "Decrypt")
+                    .clicked()
+                    || ui
+                        .selectable_value(&mut self.action, Actions::Encrypt, "Encrypt")
+                        .clicked()
+                {
+                    self.input = "".into()
+                }
+                ui.text_edit_multiline(&mut self.input);
+                if ui.button("Calculate").clicked() {
+                    match self.action {
+                        Actions::Encrypt => self.output = Poe::encrypt(&self.input),
+                        Actions::Decrypt => self.output = Poe::decrypt(&self.input),
+                    }
+                }
+                ui.label(&self.output);
             });
-            match enc {
-                true => {
-                    ui.vertical(|ui| {
-                        let name_label = ui.label("Plain Text:");
-                        ui.text_edit_multiline(&mut self.plain_text)
-                            .labelled_by(name_label.id);
-                    });
-                    if ui.button("Turn Plain Text To Cipher").clicked() {
-                        self.cipher_text = Poe::encrypt(&self.plain_text)
-                    }
-                }
-                false => {
-                    ui.vertical(|ui| {
-                        let name_label = ui.label("Cipher Text:");
-                        ui.text_edit_multiline(&mut self.cipher_text)
-                            .labelled_by(name_label.id);
-                    });
-                    if ui.button("Turn Cipher Text To Plain").clicked() {
-                        self.plain_text = Poe::decrypt(&self.cipher_text)
-                    }
-                }
-            }
         });
     }
 }

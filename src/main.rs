@@ -15,15 +15,15 @@ fn main() -> Result<(), eframe::Error> {
 }
 
 struct MyApp {
-    plain_text: String,
-    cipher_text: String,
+    input: String,
+    output: String,
 }
 
 impl Default for MyApp {
     fn default() -> Self {
         Self {
-            cipher_text: ")[:9‡* 96808-76 [5)0?3?,8 *5 )[8)-".into(),
-            plain_text: "".into(),
+            input: ")[:9‡* 96808-76 [5)0?3?,8 *5 )[8)-".into(),
+            output: "".into(),
         }
     }
 }
@@ -32,22 +32,11 @@ impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Poe Cipher App");
-            ui.vertical(|ui| {
-                let name_label = ui.label("Plain Text:");
-                ui.text_edit_multiline(&mut self.plain_text)
-                    .labelled_by(name_label.id);
-            });
-            if ui.button("Turn Plain Text To Cipher").clicked() {
-                self.cipher_text = Poe::encrypt(&self.plain_text)
+            ui.text_edit_multiline(&mut self.input);
+            if ui.button("Translate").clicked() {
+                self.output = Poe::translate(&self.input)
             }
-            ui.vertical(|ui| {
-                let name_label = ui.label("Cipher Text:");
-                ui.text_edit_multiline(&mut self.cipher_text)
-                    .labelled_by(name_label.id);
-            });
-            if ui.button("Turn Cipher Text To Plain").clicked() {
-                self.plain_text = Poe::decrypt(&self.cipher_text)
-            }
+            ui.label(&self.output);
         });
     }
 }

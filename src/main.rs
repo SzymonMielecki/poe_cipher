@@ -31,12 +31,20 @@ impl Default for MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+            ui.vertical(|ui| {
                 ui.heading("Poe Cipher App");
                 ui.text_edit_multiline(&mut self.input);
-                if ui.button("Translate").clicked() {
-                    self.output = Poe::translate(&self.input)
-                }
+                ui.horizontal(|ui| {
+                    if ui.button("Detect").clicked() {
+                        self.output = Poe::detect(&self.input)
+                    }
+                    if ui.button("Decrypt").clicked() {
+                        self.output = Poe::decrypt(&self.input)
+                    }
+                    if ui.button("Encrypt").clicked() {
+                        self.output = Poe::encrypt(&self.input)
+                    }
+                });
                 ui.label(&self.output);
             });
         });
